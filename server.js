@@ -2,9 +2,18 @@
 const express = require('express');
 const { animals } = require('./data/animals');
 const PORT = process.env.PORT || 3001;
+const fs = require('fs');
+const path = require('path');
+
 
 //instantiate server
 const app = express();
+
+//add middleware so that server can handle post
+//parse incoming string or array
+app.use(express.urlencoded({ extended: true }));
+//parse incoming json
+app.use(express.json());
 
 //filter range of animals that the api returns by the querry input
 function filterByQuery(query, animalsArray) {
@@ -44,7 +53,40 @@ function findById(id, animalsArray) {
     return result;
 }
 
-//route for front-end access to animals
+//post to data
+function createNewAnimal(body, animalsArray) {
+    const animal = body;
+    animalsArray.push(animal);
+    //write new json array to data file
+    fs.writeFileSync(
+        path.join(__dirname,'./data/animals.json'),
+        JSON.stringify({ animals: animalsArray }, null, 2)
+    );
+
+    return animal;
+};
+
+//validate animal post
+function validateAnimal(animal) {
+    if (!animal.name || typeof animal.name !== 'string') {
+        return false;
+    }
+    if (!animal.species || typeof animal.species !== 'string') {
+        return false;
+    }
+    if (!animal.diet || typeof animal.diet !== 'string') {
+        return false;
+    }
+    if (!animal.personalityTraits || !Array.isArray(animal.personalityTraits)) {
+        return false;
+    }
+    return true;
+};
+
+
+
+
+//routes for front-end access to animals ----------------------------------------------
 app.get('/api/animals', (req, res) => {
     let results = animals;
     if (req.query) {
@@ -62,6 +104,22 @@ app.get('/api/animals/:id', (req, res) => {
       }
 });
 
+// route to accept user data
+app.post('/api/animals', (req,res) => {
+    //set id based on index of array
+    req.body.id = animals.length.toString();
+    //add animal to json file and animals array within function
+    if(!validateAnimal(req.body)) {
+        res.status(400).send('the animal is not properly formatted.')
+    } else {
+        const animal = createNewAnimal(req.body, animals);
+        res.json(animal);
+    }
+
+});
+
+
+// listen
 app.listen(PORT, () => {
     console.log(`API server now on port ${PORT}!`);
 });
