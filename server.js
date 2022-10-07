@@ -23,6 +23,7 @@ function filterByQuery(query, animalsArray) {
     let filteredResults = animalsArray;
     //deal with personality traits differently, array of choices
     if (query.personalityTraits) {
+        console.log(query.personalityTraits)
         //save as a dedicated array, even if input is just a string
         if (typeof query.personalityTraits === 'string') {
             personalityTraitsArray = [query.personality]
