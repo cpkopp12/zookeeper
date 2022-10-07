@@ -14,6 +14,8 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 //parse incoming json
 app.use(express.json());
+//static files
+app.use(express.static('public'));
 
 //filter range of animals that the api returns by the querry input
 function filterByQuery(query, animalsArray) {
@@ -118,8 +120,29 @@ app.post('/api/animals', (req,res) => {
 
 });
 
+//route to serve index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+});
 
-// listen
+//route to serve animals.html
+app.get('/animals', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/animals.html'));
+});
+
+//route to serve zookeeper.html
+app.get('/zookeepers', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/zookeepers.html'));
+});
+
+//wildcard route
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '.public/index.html'));
+});
+
+
+
+// listen -------------------------------------------------------------
 app.listen(PORT, () => {
     console.log(`API server now on port ${PORT}!`);
 });

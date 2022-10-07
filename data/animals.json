@@ -108,6 +108,16 @@
         "hungry"
       ],
       "id": "10"
+    },
+    {
+      "name": "Herb",
+      "species": "Cow",
+      "diet": "herbivore",
+      "personalityTraits": [
+        "hungry",
+        "loving"
+      ],
+      "id": "11"
     }
   ]
 }
